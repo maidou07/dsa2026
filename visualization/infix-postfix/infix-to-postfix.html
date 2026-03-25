@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infix to Postfix Visualization</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-sitemap"></i> Infix to Postfix Algorithm Visualizer</h1>
+            <p class="subtitle">Visualize the step-by-step conversion of infix expressions to postfix notation using the stack-based Shunting Yard algorithm</p>
+        </header>
+
+        <main>
+            <div class="control-panel">
+                <div class="input-section">
+                    <label for="expression-input"><i class="fas fa-keyboard"></i> Enter Infix Expression:</label>
+                    <div class="input-group">
+                        <input type="text" id="expression-input" placeholder="e.g., A + B * C - D / E" value="A + B * C - D / E">
+                        <button id="validate-btn" class="btn secondary"><i class="fas fa-check-circle"></i> Validate</button>
+                    </div>
+                    <div class="examples">
+                        <span class="example-label">Try these examples:</span>
+                        <button class="example-btn" data-expr="A + B * C">A + B * C</button>
+                        <button class="example-btn" data-expr="(A + B) * C">(A + B) * C</button>
+                        <button class="example-btn" data-expr="A + B * C - D / E">A + B * C - D / E</button>
+                        <button class="example-btn" data-expr="(A + B) * (C - D)">(A + B) * (C - D)</button>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button id="step-btn" class="btn primary"><i class="fas fa-step-forward"></i> Step</button>
+                    <button id="play-btn" class="btn success"><i class="fas fa-play"></i> Play</button>
+                    <button id="pause-btn" class="btn warning"><i class="fas fa-pause"></i> Pause</button>
+                    <button id="reset-btn" class="btn danger"><i class="fas fa-redo"></i> Reset</button>
+                    <div class="speed-control">
+                        <label for="speed-slider"><i class="fas fa-tachometer-alt"></i> Speed:</label>
+                        <input type="range" id="speed-slider" min="100" max="2000" value="800">
+                        <span id="speed-value">800ms</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visualization">
+                <div class="status-bar">
+                    <div class="current-step">
+                        <span class="status-label">Current Step:</span>
+                        <span id="step-description">Enter an expression and click Step or Play to start</span>
+                    </div>
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="stat-label">Input Index:</span>
+                            <span id="input-index" class="stat-value">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Steps Taken:</span>
+                            <span id="steps-count" class="stat-value">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="algorithm-area">
+                    <div class="input-display">
+                        <h3><i class="fas fa-stream"></i> Input Expression (Infix)</h3>
+                        <div class="expression" id="input-expression">
+                            <div class="token" data-index="0">A</div>
+                            <div class="token" data-index="1">+</div>
+                            <div class="token" data-index="2">B</div>
+                            <div class="token" data-index="3">*</div>
+                            <div class="token" data-index="4">C</div>
+                            <div class="token" data-index="5">-</div>
+                            <div class="token" data-index="6">D</div>
+                            <div class="token" data-index="7">/</div>
+                            <div class="token" data-index="8">E</div>
+                        </div>
+                        <div class="pointer" id="input-pointer"></div>
+                    </div>
+
+                    <div class="stack-visualization">
+                        <h3><i class="fas fa-layer-group"></i> Operator Stack</h3>
+                        <div class="stack-container">
+                            <div class="stack-base">Stack Bottom</div>
+                            <div class="stack-items" id="stack-items">
+                                <!-- Stack items will be dynamically added here -->
+                            </div>
+                            <div class="stack-top">Stack Top</div>
+                        </div>
+                        <div class="stack-info">
+                            <div class="info-item">
+                                <span class="info-label">Stack Size:</span>
+                                <span id="stack-size" class="info-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="output-display">
+                        <h3><i class="fas fa-arrow-right"></i> Output (Postfix)</h3>
+                        <div class="expression" id="output-expression">
+                            <!-- Output tokens will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="precedence-table">
+                    <h3><i class="fas fa-sort-amount-down"></i> Operator Precedence & Associativity</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Operator</th>
+                                <th>Precedence</th>
+                                <th>Associativity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>^ (Exponentiation)</td>
+                                <td>4</td>
+                                <td>Right-to-left</td>
+                            </tr>
+                            <tr>
+                                <td>* / %</td>
+                                <td>3</td>
+                                <td>Left-to-right</td>
+                            </tr>
+                            <tr>
+                                <td>+ -</td>
+                                <td>2</td>
+                                <td>Left-to-right</td>
+                            </tr>
+                            <tr>
+                                <td>( )</td>
+                                <td>1 (special)</td>
+                                <td>N/A</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="explanation">
+                <h3><i class="fas fa-lightbulb"></i> Algorithm Steps</h3>
+                <ol id="algorithm-steps">
+                    <li class="step-active">Initialize empty stack and empty output list</li>
+                    <li>Read tokens from infix expression left to right</li>
+                    <li>If operand (letter/number), add to output</li>
+                    <li>If operator, pop from stack while stack has operators with higher or equal precedence and add to output, then push current operator</li>
+                    <li>If '(' push to stack</li>
+                    <li>If ')' pop from stack to output until '(' is found</li>
+                    <li>After reading all tokens, pop remaining operators from stack to output</li>
+                </ol>
+            </div>
+        </main>
+
+        <footer>
+            <p>Infix to Postfix Visualization | Shunting Yard Algorithm | Built with HTML, CSS & JavaScript</p>
+            <p class="footer-note">Operands: A-Z, a-z, 0-9 | Operators: + - * / ^ ( )</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
